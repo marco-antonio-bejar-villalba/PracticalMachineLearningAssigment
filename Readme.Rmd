@@ -2,7 +2,7 @@
 title: "Parctical Machine Learning Assigment"
 author: "Marco Antonio Béjar Villalba."
 date: "1/27/2021"
-output: html_document
+output: md_document
 ---
 
 ```{r setup, include=FALSE}
