@@ -1,0 +1,131 @@
+```{r setup, include=FALSE}
+require(ggplot2)
+require(RColorBrewer)
+require(reshape2)
+require(ggthemes)
+library(GGally)
+
+```
+
+## Executive Summary
+
+You work for Motor Trend, a magazine about the automobile industry. Looking at a data set of a collection of cars, they are interested in exploring the relationship between a set of variables and miles per gallon (MPG) (outcome). They are particularly interested in the following two questions:
+
+- “Is an automatic or manual transmission better for MPG”
+- "Quantify the MPG difference between automatic and manual transmissions"  
+
+## Is an automatic or manual transmission better for MPG?
+
+For this topic I will use the confidence intervals and a t test to verify this.
+
+For the confidence interval (see fig 1 in order to have a fast view of the differences in a boxplot):
+
+```{r}
+mtcars$transmition<-factor(mtcars$am,labels = c("automatic","manual"))
+mtcars$cyl<-factor(mtcars$cyl)
+mtcars$vs<-factor(mtcars$vs)
+mtcars$gear<-factor(mtcars$gear)
+mtcars$carb<-factor(mtcars$carb)
+spliteddata<-split(mtcars,mtcars$transmition)
+
+```
+
+Interval for manual:
+
+```{r echo=FALSE}
+mean(spliteddata$manual$mpg)+c(-1,1)*qt(0.975,nrow(spliteddata$manual)-1)*sd(spliteddata$manual$mpg)/sqrt(nrow(spliteddata$manual))
+```
+
+Interval for automatic:
+
+```{r echo=FALSE}
+mean(spliteddata$automatic$mpg)+c(-1,1)*qt(0.975,nrow(spliteddata$automatic)-1)*sd(spliteddata$automatic$mpg)/sqrt(nrow(spliteddata$automatic))
+```
+
+Doing a t test:
+
+```{r}
+testMpg<-t.test(spliteddata$automatic$mpg,spliteddata$manual$mpg, alternative = "two.sided", paired=FALSE, var.equal = FALSE)
+testMpg
+```
+
+So we can say that a manual transmission is better given the t value of 0.001374.
+We can see the confidence intervals in fig 2.
+
+## Quantify the MPG difference between automatic and manual transmissions
+
+We will get the best model to describe the effects on mpg:
+
+See fig 3 and 4 for a comparison of the linear models for every regressor fig 3 depicts the regressors for manual transmission and 4 for automatic.
+
+```{r message=FALSE, results='hide'}
+fit<-lm(mpg~.,mtcars)
+model<-step(fit)
+```
+```{r}
+summary(model)
+```
+The results says us that the model is more than 86% influenced by cyl6, cyl8, hp, wt and the manual transmission.
+The factor for the manual transmission is 1.8 better than automatic.
+
+## Appendix
+
+Fig 1.
+
+```{r echo=FALSE, fig.width = 3,fig.height=3}
+gg<-ggplot(data=mtcars,aes(transmition,mpg))
+gg<-gg+geom_boxplot(aes(fill=transmition))
+gg<-gg+theme_economist()
+gg<-gg+scale_fill_brewer(palette = "Purples")
+gg
+```
+
+Fig 2.
+
+```{r echo=FALSE, fig.width = 3,fig.height=3}
+manualMean<-mean(spliteddata$manual$mpg)
+automaticMean<-mean(spliteddata$automatic$mpg)
+manualSD<-sd(spliteddata$manual$mpg)
+automaticSD<-sd(spliteddata$automatic$mpg)
+ddfAtomatic<-nrow(spliteddata$automatic)
+ddfManual<-nrow(spliteddata$manual)
+
+xvalues<-seq(12,31,.1)
+
+yValueManual<-dt(xvalues-automaticMean,ddfAtomatic)
+
+yValueAutomatic<-dt(xvalues-manualMean,ddfManual)
+
+primariyDataFrame<-data.frame(x=xvalues,manual=yValueManual,automatic=yValueAutomatic)
+
+finalDataFrame<-melt(primariyDataFrame,id="x")
+
+colnames(finalDataFrame)= c("xval","dy","yval")
+
+gg<-ggplot(data = finalDataFrame,aes(x=xval,y=yval,group=dy, colour=dy))
+gg<-gg+geom_line(size=3)
+gg<-gg+theme_economist()
+gg<-gg+scale_color_brewer(palette = "Purples",type=div)
+gg
+```
+
+Fig 3.
+
+```{r echo=FALSE, fig.width = 15,fig.height=15, message=FALSE, results='hide', warning=FALSE}
+my_fn <- function(data, mapping, method="lm", ...){
+  p <- ggplot(data = data, mapping = mapping) + 
+    geom_point() + 
+    geom_smooth(method=method, ...)
+  p
+}
+
+ggpairs(spliteddata$manual, lower = list(continuous = wrap(my_fn)))
+```
+
+Fig 4.
+
+```{r echo=FALSE, fig.width = 15,fig.height=15, message=FALSE, results='hide', warning=FALSE}
+ggpairs(spliteddata$automatic, lower = list(continuous = wrap(my_fn)))
+```
+
+
