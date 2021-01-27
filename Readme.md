@@ -1687,7 +1687,7 @@ Random forest:
 
 and GBM:
 
-    matrixGBM
+    matrixGBM 
 
     ## Confusion Matrix and Statistics
     ## 
