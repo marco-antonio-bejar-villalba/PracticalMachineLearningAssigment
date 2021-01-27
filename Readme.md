@@ -21,7 +21,7 @@ available from the website here:
 <a href="http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har" class="uri">http://web.archive.org/web/20161224072740/http:/groupware.les.inf.puc-rio.br/har</a>
 (see the section on the Weight Lifting Exercise Dataset). \[1\]
 
-Analisis
+Analysis
 ========
 
 I have loaded the data and analized it as follows:
@@ -205,7 +205,7 @@ and GBM:
 So, the best performance is with the random forest using only 36
 variables.
 
-Using this model for the data to answer the test in cursera:
+Using this model for the data to answer the test in coursera:
 
     predTotRandmForest<-predict(modelRandomForest,newdata=dataValidation,type="class")
     predTotRandmForest
