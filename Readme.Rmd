@@ -2,7 +2,7 @@
 title: "Parctical Machine Learning Assigment"
 author: "Marco Antonio Béjar Villalba."
 date: "1/27/2021"
-output: md_document
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
@@ -68,24 +68,24 @@ variables).
 
 After that I construct the models, I will use GBM, Forest and Random Forest to compare them.
 
-```{r message=FALSE, warning=FALSE, cache=TRUE}
+```{r message=FALSE, warning=FALSE, cache=TRUE, results=FALSE}
 modelForest<-train(classe~.,data = dataTraining,method="rpart")
-#modelGBM<-train(classe~.,data = dataTraining,method="gbm")
-#I got a freez using train, or it is so intensive that I though it was a freez so I used randomForest.
+modelGBM<-train(classe~.,data = dataTraining,method="gbm")
+#I got a freeze using train, or it is so intensive that I though it was a freez so I used randomForest.
 modelRandomForest<-randomForest(classe~.,data=dataTraining,type="class")
 
 ```
 
 I get the results for the accuracy of the models.
 
-```{r  message=FALSE, warning=FALSE, cache=TRUE}
+```{r  message=FALSE, warning=FALSE, cache=TRUE, results=FALSE}
 predForest<-predict(modelForest,newdata=dataTesting)
 predRandomTree<-predict(modelRandomForest,newdata=dataTesting,type="class")
-#predGBM<-predict(modelGBM,newdata=dataTesting)
+predGBM<-predict(modelGBM,newdata=dataTesting)
 
 matrixForest<-confusionMatrix(predForest, dataTesting$classe)
 matrixRandomForest<-confusionMatrix(predRandomTree, dataTesting$classe)
-#matrixGBM<-confusionMatrix(predGBM, dataTesting$classe)
+matrixGBM<-confusionMatrix(predGBM, dataTesting$classe)
 ```
 
 These are the accuracies for forest:
@@ -103,7 +103,16 @@ matrixRandomForest
 and GBM:
 
 ```{r}
+matrixGBM
+```
 
+So, the best performance is with the random forest using only 36 variables.
+
+Using this model for the data to answer the test in cursera:
+
+```{r}
+predTotRandmForest<-predict(modelRandomForest,newdata=dataValidation,type="class")
+predTotRandmForest
 ```
 
 

@@ -457,17 +457,17 @@ dataTesting&lt;-dataTrainingAndTesting[-inTrain,]</code></pre>
 <p>I transform the classe variable in a factor just for convenience and split the data set also I get out some variables, my thesis is that (after have reviewed the data set) the meaningful variables are those that give information about the acceleration of the movement, and these are those that finish with _x, _y, and _z, so the ones that describes acceleration on the three axis, I have run some exercises using all the variables and I have found that my thesis is in practice true or at least true enough to build a good model (besides it is the time factor because some models last a lot of time in training using all the variables).</p>
 <p>After that I construct the models, I will use GBM, Forest and Random Forest to compare them.</p>
 <pre class="r"><code>modelForest&lt;-train(classe~.,data = dataTraining,method=&quot;rpart&quot;)
-#modelGBM&lt;-train(classe~.,data = dataTraining,method=&quot;gbm&quot;)
-#I got a freez using train, or it is so intensive that I though it was a freez so I used randomForest.
+modelGBM&lt;-train(classe~.,data = dataTraining,method=&quot;gbm&quot;)
+#I got a freeze using train, or it is so intensive that I though it was a freez so I used randomForest.
 modelRandomForest&lt;-randomForest(classe~.,data=dataTraining,type=&quot;class&quot;)</code></pre>
 <p>I get the results for the accuracy of the models.</p>
 <pre class="r"><code>predForest&lt;-predict(modelForest,newdata=dataTesting)
 predRandomTree&lt;-predict(modelRandomForest,newdata=dataTesting,type=&quot;class&quot;)
-#predGBM&lt;-predict(modelGBM,newdata=dataTesting)
+predGBM&lt;-predict(modelGBM,newdata=dataTesting)
 
 matrixForest&lt;-confusionMatrix(predForest, dataTesting$classe)
 matrixRandomForest&lt;-confusionMatrix(predRandomTree, dataTesting$classe)
-#matrixGBM&lt;-confusionMatrix(predGBM, dataTesting$classe)</code></pre>
+matrixGBM&lt;-confusionMatrix(predGBM, dataTesting$classe)</code></pre>
 <p>These are the accuracies for forest:</p>
 <pre class="r"><code>matrixForest</code></pre>
 <pre><code>## Confusion Matrix and Statistics
@@ -508,35 +508,75 @@ matrixRandomForest&lt;-confusionMatrix(predRandomTree, dataTesting$classe)
 ## 
 ##           Reference
 ## Prediction    A    B    C    D    E
-##          A 1670    8    0    1    0
-##          B    3 1123   24    0    0
-##          C    0    8 1002   18    3
-##          D    0    0    0  945    7
-##          E    1    0    0    0 1072
+##          A 1668   11    0    4    0
+##          B    3 1121   20    0    0
+##          C    0    7 1006   15    3
+##          D    2    0    0  945    6
+##          E    1    0    0    0 1073
 ## 
 ## Overall Statistics
 ##                                           
-##                Accuracy : 0.9876          
-##                  95% CI : (0.9844, 0.9903)
+##                Accuracy : 0.9878          
+##                  95% CI : (0.9846, 0.9904)
 ##     No Information Rate : 0.2845          
 ##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
 ##                                           
-##                   Kappa : 0.9843          
+##                   Kappa : 0.9845          
 ##                                           
 ##  Mcnemar&#39;s Test P-Value : NA              
 ## 
 ## Statistics by Class:
 ## 
 ##                      Class: A Class: B Class: C Class: D Class: E
-## Sensitivity            0.9976   0.9860   0.9766   0.9803   0.9908
-## Specificity            0.9979   0.9943   0.9940   0.9986   0.9998
-## Pos Pred Value         0.9946   0.9765   0.9719   0.9926   0.9991
-## Neg Pred Value         0.9990   0.9966   0.9951   0.9961   0.9979
+## Sensitivity            0.9964   0.9842   0.9805   0.9803   0.9917
+## Specificity            0.9964   0.9952   0.9949   0.9984   0.9998
+## Pos Pred Value         0.9911   0.9799   0.9758   0.9916   0.9991
+## Neg Pred Value         0.9986   0.9962   0.9959   0.9961   0.9981
 ## Prevalence             0.2845   0.1935   0.1743   0.1638   0.1839
-## Detection Rate         0.2838   0.1908   0.1703   0.1606   0.1822
-## Detection Prevalence   0.2853   0.1954   0.1752   0.1618   0.1823
-## Balanced Accuracy      0.9977   0.9901   0.9853   0.9894   0.9953</code></pre>
+## Detection Rate         0.2834   0.1905   0.1709   0.1606   0.1823
+## Detection Prevalence   0.2860   0.1944   0.1752   0.1619   0.1825
+## Balanced Accuracy      0.9964   0.9897   0.9877   0.9893   0.9957</code></pre>
 <p>and GBM:</p>
+<pre class="r"><code>matrixGBM</code></pre>
+<pre><code>## Confusion Matrix and Statistics
+## 
+##           Reference
+## Prediction    A    B    C    D    E
+##          A 1611   75   31   24    8
+##          B   22  965   61   11   31
+##          C   18   76  909   65   29
+##          D   22   14   17  847   48
+##          E    1    9    8   17  966
+## 
+## Overall Statistics
+##                                           
+##                Accuracy : 0.9003          
+##                  95% CI : (0.8923, 0.9078)
+##     No Information Rate : 0.2845          
+##     P-Value [Acc &gt; NIR] : &lt; 2.2e-16       
+##                                           
+##                   Kappa : 0.8737          
+##                                           
+##  Mcnemar&#39;s Test P-Value : &lt; 2.2e-16       
+## 
+## Statistics by Class:
+## 
+##                      Class: A Class: B Class: C Class: D Class: E
+## Sensitivity            0.9624   0.8472   0.8860   0.8786   0.8928
+## Specificity            0.9672   0.9737   0.9613   0.9795   0.9927
+## Pos Pred Value         0.9211   0.8853   0.8286   0.8935   0.9650
+## Neg Pred Value         0.9848   0.9637   0.9756   0.9763   0.9762
+## Prevalence             0.2845   0.1935   0.1743   0.1638   0.1839
+## Detection Rate         0.2737   0.1640   0.1545   0.1439   0.1641
+## Detection Prevalence   0.2972   0.1852   0.1864   0.1611   0.1701
+## Balanced Accuracy      0.9648   0.9104   0.9236   0.9291   0.9428</code></pre>
+<p>So, the best performance is with the random forest using only 36 variables.</p>
+<p>Using this model for the data to answer the test in cursera:</p>
+<pre class="r"><code>predTotRandmForest&lt;-predict(modelRandomForest,newdata=dataValidation,type=&quot;class&quot;)
+predTotRandmForest</code></pre>
+<pre><code>##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
+##  B  A  B  A  A  E  D  B  A  A  B  C  B  A  E  E  A  B  B  B 
+## Levels: A B C D E</code></pre>
 <p>[1] Velloso, E.; Bulling, A.; Gellersen, H.; Ugulino, W.; Fuks, H. Qualitative Activity Recognition of Weight Lifting Exercises. Proceedings of 4th International Conference in Cooperation with SIGCHI (Augmented Human ’13) . Stuttgart, Germany: ACM SIGCHI, 2013.</p>
 <p>Read more: <a href="http://groupware.les.inf.puc-rio.br/har#ixzz6kmFRRrJa" class="uri">http://groupware.les.inf.puc-rio.br/har#ixzz6kmFRRrJa</a></p>
 </div>
